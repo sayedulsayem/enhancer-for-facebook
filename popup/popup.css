@@ -1,0 +1,12 @@
+body {
+    width: 200px;
+    padding: 10px;
+}
+
+.speed-control {
+    text-align: center;
+}
+
+#eff-playback-speed {
+    width: 50px;
+}
