@@ -1,9 +1,14 @@
 let speed = '1.5';
 
+let browserEngine = chrome;
+if (typeof chrome === 'undefined') {
+    browserEngine = browser;
+}
+
 function increasePlayBackSpeed(speed) {
     var videos = document.getElementsByTagName('video');
     for (var i = 0; i < videos.length; i++) {
-        videos[i].playbackRate = parseFloat(speed);
+        videos[ i ].playbackRate = parseFloat(speed);
     }
 }
 
@@ -17,57 +22,79 @@ function debounce(func, delay) {
     };
 }
 
-if (typeof chrome !== 'undefined') {
-    chrome.storage.sync.get(['speed'], function (result) {
-        speed = result.speed || '1.5';
-    });
+browserEngine.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.speed) {
+        speed = request.speed
+        increasePlayBackSpeed(request.speed);
+    }
+});
 
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+browserEngine.runtime.onMessage.addListener(
+    function (request, sender, sendResponse) {
         if (request.speed) {
             speed = request.speed
             increasePlayBackSpeed(request.speed);
         }
-    });
+    }
+);
 
-    chrome.runtime.onMessage.addListener(
-        function (request, sender, sendResponse) {
-            if (request.speed) {
-                speed = request.speed
-                increasePlayBackSpeed(request.speed);
-            }
-        }
-    );
+browserEngine.storage.sync.get([ 'speed' ], function (result) {
+    console.log(result);
+    speed = result.speed || '1.5';
+    increasePlayBackSpeed(speed);
+});
 
-    chrome.storage.sync.get(['speed'], function (result) {
-        const speed = result.speed || '1.5';
-        increasePlayBackSpeed(speed);
-    });
-} else if (typeof browser !== 'undefined') {
-    browser.storage.sync.get(['speed'], function (result) {
-        speed = result.speed || '1.5';
-    });
+// if (typeof chrome !== 'undefined') {
+//     chrome.storage.sync.get([ 'speed' ], function (result) {
+//         speed = result.speed || '1.5';
+//     });
 
-    browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.speed) {
-            speed = request.speed;
-            increasePlayBackSpeed(speed);
-        }
-    });
+//     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//         if (request.speed) {
+//             speed = request.speed
+//             increasePlayBackSpeed(request.speed);
+//         }
+//     });
 
-    browser.runtime.onMessage.addListener(
-        function (request, sender, sendResponse) {
-            if (request.speed) {
-                speed = request.speed
-                increasePlayBackSpeed(speed);
-            }
-        }
-    );
+//     chrome.runtime.onMessage.addListener(
+//         function (request, sender, sendResponse) {
+//             if (request.speed) {
+//                 speed = request.speed
+//                 increasePlayBackSpeed(request.speed);
+//             }
+//         }
+//     );
 
-    browser.storage.sync.get(['speed']).then(function (result) {
-        speed = result.speed || '1.5';
-        increasePlayBackSpeed(speed);
-    });
-}
+//     chrome.storage.sync.get([ 'speed' ], function (result) {
+//         const speed = result.speed || '1.5';
+//         increasePlayBackSpeed(speed);
+//     });
+// } else if (typeof browser !== 'undefined') {
+//     browser.storage.sync.get([ 'speed' ], function (result) {
+//         speed = result.speed || '1.5';
+//     });
+
+//     browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+//         if (request.speed) {
+//             speed = request.speed;
+//             increasePlayBackSpeed(speed);
+//         }
+//     });
+
+//     browser.runtime.onMessage.addListener(
+//         function (request, sender, sendResponse) {
+//             if (request.speed) {
+//                 speed = request.speed
+//                 increasePlayBackSpeed(speed);
+//             }
+//         }
+//     );
+
+//     browser.storage.sync.get([ 'speed' ]).then(function (result) {
+//         speed = result.speed || '1.5';
+//         increasePlayBackSpeed(speed);
+//     });
+// }
 
 window.addEventListener('load', function () {
     increasePlayBackSpeed(speed);
